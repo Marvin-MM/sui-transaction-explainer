@@ -1,0 +1,6 @@
+{
+  "locales": ["en", "zh"],
+  "defaultLocale": "en",
+  "namespaces": ["common", "dashboard", "explain"],
+  "defaultNS": "common"
+}

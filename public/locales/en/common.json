@@ -1,0 +1,24 @@
+{
+  "app": {
+    "title": "Sui Transaction Explainer",
+    "description": "Understand Sui blockchain transactions"
+  },
+  "navigation": {
+    "home": "Home",
+    "dashboard": "Dashboard",
+    "settings": "Settings",
+    "logout": "Logout",
+    "login": "Login",
+    "signup": "Sign Up"
+  },
+  "common": {
+    "explain": "Explain",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "back": "Back"
+  }
+}

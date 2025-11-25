@@ -1,0 +1,188 @@
+// generator client {
+//   provider        = "prisma-client-js"
+//   previewFeatures = ["fullTextSearchPostgres"]
+// }
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["fullTextSearchPostgres"]
+  // Add this for better compatibility
+  binaryTargets   = ["native", "linux-musl"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String   @id @default(cuid())
+  name          String?
+  email         String   @unique
+  emailVerified Boolean?
+  image         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  walletAddress       String? @unique
+  walletProvider      String?
+  onboardingEmailSent Boolean @default(false)
+  theme               String  @default("system")
+  language            String  @default("en")
+
+  sessions Session[]
+  accounts Account[]
+
+  transactions       Transaction[]
+  webhooks           Webhook[]
+  notificationTokens NotificationToken[]
+  preferences        UserPreferences?
+
+  @@map("users")
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  expiresAt DateTime
+  token     String
+  createdAt DateTime
+  updatedAt DateTime
+  ipAddress String?
+  userAgent String?
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([token])
+  @@map("sessions")
+}
+
+model Account {
+  id                    String    @id @default(cuid())
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime
+  updatedAt             DateTime
+
+  @@map("accounts")
+}
+
+model Verification {
+  id         String    @id @default(cuid())
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime?
+  updatedAt  DateTime?
+
+  @@map("verifications")
+}
+
+model UserPreferences {
+  id                 String   @id @default(cuid())
+  userId             String   @unique
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  darkMode           Boolean  @default(false)
+  emailNotifications Boolean  @default(true)
+  pushNotifications  Boolean  @default(true)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  @@map("user_preferences")
+}
+
+model Wallet {
+  id            String    @id @default(cuid())
+  address       String    @unique
+  provider      String
+  displayName   String?
+  lastFetchedAt DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@map("wallets")
+}
+
+model Transaction {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  digest          String   @unique
+  sender          String
+  recipients      String[]
+  status          String   @default("success")
+  gasUsed         String
+  gasBudget       String
+  executionStatus String?
+
+  moveCallNames      String[]
+  objectsCreated     Int
+  objectsMutated     Int
+  objectsTransferred Int
+
+  summary String
+  rawData Json
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([digest])
+  @@map("transactions")
+}
+
+model Webhook {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  url         String
+  name        String
+  description String?
+  integration String  @default("discord")
+  isActive    Boolean @default(true)
+
+  triggerNewTransaction Boolean @default(true)
+  triggerObjectCreated  Boolean @default(false)
+  triggerTransferIn     Boolean @default(false)
+  triggerTransferOut    Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@map("webhooks")
+}
+
+model NotificationToken {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  token    String  @unique
+  platform String  @default("web")
+  isActive Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@map("notification_tokens")
+}
+
+model CachedTransaction {
+  id        String   @id @default(cuid())
+  digest    String   @unique
+  data      Json
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@map("cached_transactions")
+}
