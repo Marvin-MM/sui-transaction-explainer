@@ -301,7 +301,7 @@ import { Switch } from "@/components/ui/switch"
 import { useTheme } from "next-themes"
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
-import { Sun, Moon, Plus, Trash2, LogOut, Languages } from "lucide-react"
+import { Sun, Moon, Plus, Trash2, LogOut, Languages, Wallet } from "lucide-react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -476,7 +476,7 @@ export function SettingsModal({ open, onOpenChange }: SettingsModalProps) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-[550px]">
         <DialogHeader>
           <DialogTitle>Settings</DialogTitle>
           <DialogDescription>Manage your preferences and integrations.</DialogDescription>
@@ -566,9 +566,9 @@ export function SettingsModal({ open, onOpenChange }: SettingsModalProps) {
                   <Card className="bg-muted/50">
                     <CardContent className="pt-4">
                       <p className="text-xs text-muted-foreground mb-2">Connected Wallet</p>
-                      <p className="text-sm font-mono truncate mb-3">{currentAccount.address}</p>
+                      <p className="text-sm font-mono truncate mb-3">{currentAccount.address.trim().slice(0, 18) + "..." + currentAccount.address.trim().slice(-8)}</p>
                       <Button variant="destructive" size="sm" onClick={handleDisconnectWallet} className="w-full">
-                        <LogOut className="mr-2 h-4 w-4" />
+                        <Wallet className="mr-2 h-4 w-4" />
                         Disconnect Wallet
                       </Button>
                       <p className="text-xs text-muted-foreground mt-2">
