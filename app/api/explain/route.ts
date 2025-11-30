@@ -52,7 +52,12 @@ export async function POST(request: NextRequest) {
           objectsCreated: explanation.objectsCreated,
           objectsMutated: explanation.objectsMutated,
           objectsTransferred: explanation.objectsTransferred,
+          objectsDeleted: explanation.objectsDeleted || 0,
           summary: explanation.summary,
+          detailedSummary: explanation.detailedSummary,
+          technicalSummary: explanation.technicalSummary,
+          transactionType: explanation.transactionType,
+          userFriendlyContext: explanation.userFriendlyContext,
           rawData: explanation.objects as any,
         }
       })

@@ -1,11 +1,6 @@
-// generator client {
-//   provider        = "prisma-client-js"
-//   previewFeatures = ["fullTextSearchPostgres"]
-// }
 generator client {
   provider        = "prisma-client-js"
   previewFeatures = ["fullTextSearchPostgres"]
-  // Add this for better compatibility
   binaryTargets   = ["native", "linux-musl"]
 }
 
@@ -127,14 +122,21 @@ model Transaction {
   objectsCreated     Int
   objectsMutated     Int
   objectsTransferred Int
+  objectsDeleted     Int      @default(0)
 
-  summary String
+  summary            String
+  detailedSummary    String?  @db.Text
+  technicalSummary   String?  @db.Text
+  transactionType    String?
+  userFriendlyContext String? @db.Text
+  
   rawData Json
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([digest])
+  @@index([userId, createdAt])
   @@map("transactions")
 }
 
@@ -184,5 +186,6 @@ model CachedTransaction {
   expiresAt DateTime
   createdAt DateTime @default(now())
 
+  @@index([expiresAt])
   @@map("cached_transactions")
 }
