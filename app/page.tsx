@@ -13,6 +13,7 @@ import { useSuiClientContext } from "@mysten/dapp-kit"
 import { TransactionFlow } from "@/components/transaction-flow"
 import { EnhancedTransactionDisplay } from "@/components/enhanced-transaction-display"
 import { useUser } from "@/hooks/use-user"
+import { AIExplanationPanel } from "@/components/AIExplanationPanel"
 
 interface ExplanationResult {
   explanation: {
@@ -51,10 +52,15 @@ export default function Home() {
   const ctx = useSuiClientContext()
   const { user } = useUser()
 
+  const [showAiPanel, setShowAiPanel] = useState(false)
+  const [aiExplanation, setAiExplanation] = useState("")
+  const [aiLoading, setAiLoading] = useState(false)
+
   const handleExplain = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
     setError(null)
+    setShowAiPanel(false) // Reset panel
 
     try {
       const response = await fetch("/api/explain", {
@@ -71,6 +77,26 @@ export default function Home() {
       const data = await response.json()
       setResult(data)
       setDigest("")
+
+      // Trigger AI Explanation
+      setShowAiPanel(true)
+      setAiLoading(true)
+
+      // Fetch AI explanation in background
+      fetch("/api/ai-explain", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ transactionData: data.explanation })
+      })
+        .then(res => res.json())
+        .then(aiData => {
+          if (aiData.explanation) {
+            setAiExplanation(aiData.explanation)
+          }
+        })
+        .catch(err => console.error("AI Error:", err))
+        .finally(() => setAiLoading(false))
+
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to explain transaction")
     } finally {
@@ -79,7 +105,7 @@ export default function Home() {
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-background via-background to-muted">
+    <main className="min-h-screen bg-gradient-to-br from-background via-background to-muted relative overflow-hidden">
       {/* Hero Section */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
         <motion.div
@@ -229,6 +255,7 @@ export default function Home() {
                 onClick={() => {
                   setResult(null)
                   setDigest("")
+                  setShowAiPanel(false)
                 }}
               >
                 Explain Another
@@ -282,6 +309,15 @@ export default function Home() {
           ))}
         </div>
       </section>
+
+      {/* AI Explanation Panel */}
+      <AIExplanationPanel
+        isOpen={showAiPanel}
+        onClose={() => setShowAiPanel(false)}
+        explanation={aiExplanation}
+        isLoading={aiLoading}
+        transactionData={result?.explanation}
+      />
     </main>
   )
 }

@@ -1,0 +1,7 @@
+{
+  "name": "VoxExplain AI",
+  "description": "A voice-first AI agent dedicated to explaining complex topics simply and clearly in real-time.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
