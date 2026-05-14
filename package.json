@@ -61,7 +61,7 @@
     "input-otp": "latest",
     "isomorphic-dompurify": "latest",
     "lucide-react": "^0.454.0",
-    "next": "16.0.3",
+    "next": "16.0.10",
     "next-intl": "latest",
     "next-pwa": "latest",
     "next-themes": "latest",
